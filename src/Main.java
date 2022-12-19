@@ -21,6 +21,7 @@ public class Main {
             print2D(game);
             getInput(game);
 
+            System.out.println("ROWS");
             for (int[] row : game) {
                 countFreq(row);
                 System.out.println();
@@ -29,18 +30,17 @@ public class Main {
             for (int i = 0; i < game.length; i++){
                 int[] column = getColumn(game, i);
                 countFreq(column);
-                System.out.println();
+                System.out.println("\n");
             }
-            System.out.println();
-            getBlock(game, 0, 0);
-            getBlock(game, 3, 0);
-            getBlock(game, 6, 0);
-            getBlock(game, 0, 3);
-            getBlock(game, 3, 3);
-            getBlock(game, 6, 3);
-            getBlock(game, 0, 6);
-            getBlock(game, 3, 6);
-            getBlock(game, 6, 6);
+            countBlockFreq(getBlock(game, 0, 0));
+            countBlockFreq(getBlock(game, 3, 0));
+            countBlockFreq(getBlock(game, 6, 0));
+            countBlockFreq(getBlock(game, 0, 3));
+            countBlockFreq(getBlock(game, 3, 3));
+            countBlockFreq(getBlock(game, 6, 3));
+            countBlockFreq(getBlock(game, 0, 6));
+            countBlockFreq(getBlock(game, 3, 6));
+            countBlockFreq(getBlock(game, 6, 6));
         }
     }
     public static void getInput(int[][] game){
@@ -54,29 +54,40 @@ public class Main {
             game[y][x] = value;
         }
     }
-    public static void getBlock(int[][] game, int x, int y){
+    public static int[][] getBlock(int[][] game, int x, int y){
         int[][] a = new int[game.length][];
         int i = y;
         while (i < game.length && i < y+3){
             a[i] = Arrays.copyOfRange(game[i], x, x + 3);
             i++;
         }
-        int[] values;
+        int[][] values = new int[3][3];
+        int count = 0;
         for(int[] data: a) {
+            int count2 = 0;
             if(data != null) {
                 for(int z: data){
-                    System.out.print(z);
+                    values[count][count2] = z;
+                    count2++;
                 }
-                System.out.println();
-                //System.out.println(Arrays.deepToString(data));
+                count++;
             }
         }
-        //System.out.println(Arrays.deepToString(values));
+        print2D(values);
+        System.out.println("\n");
+        return values;
     }
-    public static void countFreq(int[] arr){
-        countFreq(arr, arr.length);
+    public static boolean countBlockFreq(int[][] block){
+        for(int[] i : block){
+            if(!countFreq(i))
+                return false;
+        }
+        return true;
     }
-    public static void countFreq(int[] arr, int n)
+    public static boolean countFreq(int[] arr){
+        return countFreq(arr, arr.length);
+    }
+    public static boolean countFreq(int[] arr, int n)
     {
         boolean[] visited = new boolean[n];
         Arrays.fill(visited, false);
@@ -92,10 +103,16 @@ public class Main {
                 if (arr[i] == arr[j]) {
                     visited[j] = true;
                     count++;
+                //System.out.println("\n------------");
                 }
             }
-            System.out.println(arr[i] + " " + count);
+                //System.out.println("\n------------");
+            //System.out.println(arr[i] + " " + count);
+            if (count != 1)
+                System.out.println("Error\n");
+                return false;
         }
+        return true;
     }
     public static int[] getColumn(int[][] array, int index){
         int[] column = new int[array[0].length]; // Here I assume a rectangular 2D array!
@@ -114,6 +131,7 @@ public class Main {
     }
     public static boolean equal(final int[][] arr1, final int[][] arr2) {
         if (arr1 == null) {
+            System.out.println("\n001");
             return (arr2 == null);
         }
         if (arr2 == null) {
