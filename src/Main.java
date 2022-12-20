@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -13,34 +14,35 @@ public class Main {
             {9, 6, 1, 5, 3, 7, 2, 8, 4},
             {2, 8, 7, 4, 1, 9, 6, 3, 5},
             {3, 4, 5, 2, 8, 6, 1, 7, 9}};
-        int[][] game = solution0;
-        for (int[] row : game)
-            Arrays.fill(row, 0);
-        while(equal(solution0,game)){
+
+        //set the board
+        int[][] game = new int[solution0.length][solution0[0].length];
+        for(int i= 0; i < game.length; i++){
+            game[i] = solution0[i].clone();
+        }
+        int difficulty = 1;
+        for(int i = 0; i < difficulty; i++){
+            game[randomInt()][randomInt()] = 0;
+        }
+        //game play
+        while(!equal(game, solution0)){
             clearScreen();
             print2D(game);
+            check(solution0, game);
             getInput(game);
-
-            System.out.println("ROWS");
-            for (int[] row : game) {
-                countFreq(row);
-                System.out.println();
+        }
+        System.out.println("Congratulations!!");
+    }
+    public static int randomInt(){
+        return ThreadLocalRandom.current().nextInt(0, 9);
+    }
+    public static void check(int[][] solution, int[][] game){
+        for(int i = 0; i < solution.length; i++){
+            for(int x = 0; x < solution[i].length;x++) {
+                if((game[x][i] != 0) && (game[x][i] != solution[x][i])){
+                    System.out.println("Error at " + i + " " + x);
+                }
             }
-            System.out.println("COLS");
-            for (int i = 0; i < game.length; i++){
-                int[] column = getColumn(game, i);
-                countFreq(column);
-                System.out.println("\n");
-            }
-            countBlockFreq(getBlock(game, 0, 0));
-            countBlockFreq(getBlock(game, 3, 0));
-            countBlockFreq(getBlock(game, 6, 0));
-            countBlockFreq(getBlock(game, 0, 3));
-            countBlockFreq(getBlock(game, 3, 3));
-            countBlockFreq(getBlock(game, 6, 3));
-            countBlockFreq(getBlock(game, 0, 6));
-            countBlockFreq(getBlock(game, 3, 6));
-            countBlockFreq(getBlock(game, 6, 6));
         }
     }
     public static void getInput(int[][] game){
@@ -53,73 +55,6 @@ public class Main {
         if (validate(new int[]{x, y, value})){
             game[y][x] = value;
         }
-    }
-    public static int[][] getBlock(int[][] game, int x, int y){
-        int[][] a = new int[game.length][];
-        int i = y;
-        while (i < game.length && i < y+3){
-            a[i] = Arrays.copyOfRange(game[i], x, x + 3);
-            i++;
-        }
-        int[][] values = new int[3][3];
-        int count = 0;
-        for(int[] data: a) {
-            int count2 = 0;
-            if(data != null) {
-                for(int z: data){
-                    values[count][count2] = z;
-                    count2++;
-                }
-                count++;
-            }
-        }
-        print2D(values);
-        System.out.println("\n");
-        return values;
-    }
-    public static boolean countBlockFreq(int[][] block){
-        for(int[] i : block){
-            if(!countFreq(i))
-                return false;
-        }
-        return true;
-    }
-    public static boolean countFreq(int[] arr){
-        return countFreq(arr, arr.length);
-    }
-    public static boolean countFreq(int[] arr, int n)
-    {
-        boolean[] visited = new boolean[n];
-        Arrays.fill(visited, false);
-        // Traverse through array elements and
-        // count frequencies
-        for (int i = 0; i < n; i++) {
-            // Skip this element if already processed
-            if (visited[i])
-                continue;
-            // Count frequency
-            int count = 1;
-            for (int j = i + 1; j < n; j++) {
-                if (arr[i] == arr[j]) {
-                    visited[j] = true;
-                    count++;
-                //System.out.println("\n------------");
-                }
-            }
-                //System.out.println("\n------------");
-            //System.out.println(arr[i] + " " + count);
-            if (count != 1)
-                System.out.println("Error\n");
-                return false;
-        }
-        return true;
-    }
-    public static int[] getColumn(int[][] array, int index){
-        int[] column = new int[array[0].length]; // Here I assume a rectangular 2D array!
-        for(int i=0; i<column.length; i++){
-            column[i] = array[i][index];
-        }
-        return column;
     }
     public static boolean validate(int[] inputs){
         for (int input : inputs) {
